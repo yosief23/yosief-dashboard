@@ -1,0 +1,2299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1366, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>YOSIEF // DASHBOARD</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: 'FuturaHeavy';
+    src: local('Futura Heavy Oblique'), local('Futura-HeavyOblique'), local('Futura Bold Oblique'), local('Futura-BoldOblique');
+    font-style: oblique;
+    font-weight: 800;
+  }
+</style>
+<style>
+    :root {
+    --bg: #000000;
+    --surface: rgba(28,28,30,0.94);
+    --surface2: rgba(44,44,46,0.8);
+    --surface3: rgba(58,58,60,0.6);
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.14);
+    --accent: #0A84FF;
+    --accent2: #30D158;
+    --accent3: #FF9F0A;
+    --accent-red: #FF453A;
+    --text: rgba(255,255,255,0.88);
+    --text-dim: rgba(255,255,255,0.40);
+    --text-bright: #ffffff;
+    --danger: #FF453A;
+    --success: #30D158;
+    --radius: 13px;
+    --radius-lg: 22px;
+    --radius-xl: 28px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NAV - iOS tab bar style */
+  nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(18,18,18,0.85);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-top: 0.5px solid var(--border-strong);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 10px;
+    z-index: 100;
+  }
+
+  .nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    padding: 6px 40px;
+    border-radius: var(--radius);
+    transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    touch-action: manipulation;
+  }
+
+  .nav-btn.active { color: var(--accent); }
+  .nav-btn svg { width: 30px; height: 30px; }
+
+  /* PAGES */
+  .page { display: none; padding: 0 24px 90px; max-width: 1366px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* ===== HOME PAGE ===== */
+  .home-header {
+    margin-bottom: 20px;
+    text-align: center;
+    padding-top: 30px;
+  }
+
+  .greeting {
+    font-size: 16px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .time-display {
+    font-size: 96px;
+    font-weight: 800;
+    font-family: 'Syne', sans-serif;
+    line-height: 1;
+    color: var(--text-bright);
+    letter-spacing: -4px;
+  }
+
+  .date-display {
+    font-size: 18px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  /* iOS frosted glass card */
+  .card {
+    background: var(--surface);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .weather-temp {
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--text-bright);
+    line-height: 1;
+    font-family: 'Syne', sans-serif;
+    letter-spacing: -1px;
+  }
+
+  .weather-desc {
+    font-size: 15px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    font-weight: 600;
+  }
+
+  .weather-details {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .weather-detail {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dim);
+    background: var(--surface2);
+    padding: 5px 10px;
+    border-radius: 20px;
+    border: 0.5px solid var(--border);
+  }
+
+  .refresh-btn {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: var(--surface2);
+    border: 0.5px solid var(--border-strong);
+    border-radius: 50%;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    touch-action: manipulation;
+    width: 32px; height: 32px;
+  }
+
+  .refresh-btn:active { transform: scale(0.92); }
+  .refresh-btn svg { width: 14px; height: 14px; }
+
+  .events-list { list-style: none; }
+
+  .event-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .event-item:last-child { border-bottom: none; }
+
+  .event-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  .event-dot.reminder { background: var(--accent3); }
+
+  .event-time {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    width: 52px;
+  }
+
+  .event-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .empty-events {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-align: center;
+    padding: 16px 0;
+  }
+
+  /* BRIEFING - iOS widget style */
+  .briefing-card {
+    background: linear-gradient(145deg, rgba(10,132,255,0.15), rgba(48,209,88,0.08));
+    border: 0.5px solid rgba(10,132,255,0.3);
+    backdrop-filter: blur(40px);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+
+  .briefing-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .briefing-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.75); }
+  }
+
+  .briefing-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .briefing-text {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .briefing-btn {
+    margin-top: 14px;
+    background: rgba(10,132,255,0.18);
+    border: 0.5px solid rgba(10,132,255,0.35);
+    color: var(--accent);
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 13px 16px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.15s;
+    touch-action: manipulation;
+  }
+
+  .briefing-btn:active { transform: scale(0.98); opacity: 0.85; }
+
+  /* ===== CALENDAR PAGE ===== */
+  .page-title {
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--text-bright);
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+    padding-top: 56px;
+  }
+
+  .cal-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .cal-month {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-bright);
+  }
+
+  .cal-arrow {
+    background: var(--surface2);
+    border: 0.5px solid var(--border-strong);
+    border-radius: 50%;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.15s;
+    touch-action: manipulation;
+    width: 34px; height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
+
+  .cal-arrow:active { transform: scale(0.92); }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    margin-bottom: 10px;
+  }
+
+  .cal-day-header {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    padding: 8px 0;
+    text-transform: uppercase;
+  }
+
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    touch-action: manipulation;
+    min-height: 52px;
+    max-height: 70px;
+  }
+
+  .cal-day:active { transform: scale(0.88); }
+  .cal-day.other-month { color: var(--text-dim); opacity: 0.35; }
+  .cal-day.today { background: var(--accent); color: #fff; font-weight: 800; }
+  .cal-day.selected { background: var(--surface2); color: var(--text-bright); border: 1.5px solid var(--accent); }
+  .cal-day.has-event::after {
+    content: '';
+    position: absolute;
+    bottom: 3px;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--accent3);
+  }
+  .cal-day.today.has-event::after { background: rgba(255,255,255,0.7); }
+
+  /* ADD EVENT FORM */
+  .add-event-section {
+    background: var(--surface);
+    backdrop-filter: blur(40px);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text-bright);
+    margin-bottom: 16px;
+    letter-spacing: -0.3px;
+  }
+
+  .form-group { margin-bottom: 12px; }
+
+  .form-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .form-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius);
+    color: var(--text-bright);
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 14px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    min-height: 52px;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  .form-input:focus { border-color: var(--accent); }
+  .form-input::placeholder { color: var(--text-dim); font-weight: 500; }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .type-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    background: var(--surface2);
+    padding: 4px;
+    border-radius: var(--radius);
+  }
+
+  .type-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    touch-action: manipulation;
+    min-height: 40px;
+  }
+
+  .type-btn.active-event { background: var(--accent); color: #fff; }
+  .type-btn.active-reminder { background: var(--accent3); color: #fff; }
+
+  .submit-btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: var(--radius);
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s;
+    touch-action: manipulation;
+    min-height: 52px;
+    letter-spacing: 0.3px;
+  }
+
+  .submit-btn:active { transform: scale(0.98); opacity: 0.85; }
+
+  /* EVENTS LIST */
+  .events-section {
+    background: var(--surface);
+    backdrop-filter: blur(40px);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+  }
+
+  .event-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 14px;
+    background: var(--surface2);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    border-left: 3px solid var(--accent);
+  }
+
+  .event-card.reminder { border-left-color: var(--accent3); }
+  .event-card-info { flex: 1; }
+
+  .event-card-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 3px;
+  }
+
+  .event-card-meta {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dim);
+  }
+
+  .delete-btn {
+    background: rgba(255,69,58,0.12);
+    border: none;
+    border-radius: 8px;
+    color: var(--accent-red);
+    cursor: pointer;
+    padding: 8px;
+    transition: all 0.15s;
+    touch-action: manipulation;
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .delete-btn:active { transform: scale(0.9); }
+
+  /* ===== CHAT PAGE ===== */
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 200px);
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 16px;
+    scrollbar-width: none;
+  }
+
+  .chat-messages::-webkit-scrollbar { display: none; }
+
+  .message {
+    margin-bottom: 4px;
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.25s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .message.user { align-items: flex-end; }
+  .message.assistant { align-items: flex-start; }
+
+  .message-bubble {
+    max-width: 78%;
+    padding: 12px 16px;
+    border-radius: 20px;
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .message.user .message-bubble {
+    background: var(--accent);
+    color: #fff;
+    border-bottom-right-radius: 5px;
+    font-weight: 600;
+  }
+
+  .message.assistant .message-bubble {
+    background: var(--surface);
+    border: 0.5px solid var(--border-strong);
+    color: var(--text);
+    border-bottom-left-radius: 5px;
+  }
+
+  .message-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    padding: 0 4px;
+    text-transform: uppercase;
+  }
+
+  .chat-input-area {
+    display: flex;
+    gap: 10px;
+    padding-top: 12px;
+    border-top: 0.5px solid var(--border-strong);
+    align-items: flex-end;
+  }
+
+  .chat-input {
+    flex: 1;
+    background: var(--surface);
+    border: 0.5px solid var(--border-strong);
+    border-radius: 22px;
+    color: var(--text-bright);
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 13px 18px;
+    outline: none;
+    resize: none;
+    min-height: 50px;
+    max-height: 120px;
+    transition: border-color 0.2s;
+    line-height: 1.4;
+  }
+
+  .chat-input:focus { border-color: var(--accent); }
+  .chat-input::placeholder { color: var(--text-dim); }
+
+  .send-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.15s;
+    touch-action: manipulation;
+    width: 50px; height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .send-btn:active { transform: scale(0.92); }
+  .send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .thinking {
+    display: flex;
+    gap: 5px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 0.5px solid var(--border-strong);
+    border-radius: 20px;
+    border-bottom-left-radius: 5px;
+    width: fit-content;
+    margin-bottom: 4px;
+  }
+
+  .thinking span {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    animation: bounce 1.2s infinite;
+  }
+
+  .thinking span:nth-child(2) { animation-delay: 0.2s; }
+  .thinking span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
+  }
+
+  .model-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 0.5px solid var(--border-strong);
+    border-radius: 22px;
+  }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--text-dim);
+  }
+
+  .status-dot.online { background: var(--success); }
+
+  .status-text {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dim);
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 0px; }
+
+  /* TOAST - iOS style */
+  .toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    background: rgba(44,44,46,0.95);
+    backdrop-filter: blur(40px);
+    color: var(--text-bright);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px 22px;
+    border-radius: 22px;
+    z-index: 200;
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    border: 0.5px solid var(--border-strong);
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ===== CUSTOM KEYBOARD ===== */
+  .kb-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: transparent;
+  }
+  .kb-overlay.active { display: block; }
+
+  .keyboard {
+    position: fixed;
+    bottom: -100%;
+    left: 0; right: 0;
+    background: rgba(22,22,26,0.97);
+    backdrop-filter: blur(40px) saturate(180%);
+    border-top: 0.5px solid rgba(255,255,255,0.14);
+    padding: 12px 10px 20px;
+    z-index: 501;
+    transition: bottom 0.28s cubic-bezier(0.32,0.72,0,1);
+    user-select: none;
+  }
+
+  .keyboard.active { bottom: 0; }
+
+  .kb-done {
+    background: #0A84FF;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+    touch-action: manipulation;
+  }
+
+  .kb-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding: 0 10px;
+  }
+
+  .kb-key {
+    background: rgba(58,58,60,0.9);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    height: 62px;
+    min-width: 40px;
+    flex: 1;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background 0.08s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    max-width: 110px;
+  }
+
+  .kb-key:active { background: rgba(100,100,105,0.9); }
+
+  .kb-key.wide { max-width: 70px; font-size: 13px; }
+  .kb-key.space { max-width: 999px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.6); }
+  .kb-key.action { background: rgba(10,132,255,0.25); color: #0A84FF; }
+  .kb-key.dark { background: rgba(28,28,30,0.9); font-size: 13px; font-weight: 700; }
+
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
+  <div class="home-header">
+    <div class="greeting" id="greeting">GOOD MORNING</div>
+    <div class="time-display" id="clock">00:00</div>
+    <div class="date-display" id="date-display">Loading...</div>
+    <div id="bible-verse" style="margin-top:12px;font-size:16px;font-weight:500;color:rgba(255,255,255,0.55);font-style:italic;max-width:560px;margin-left:auto;margin-right:auto;line-height:1.6;letter-spacing:0.2px;"></div>
+  </div>
+
+  <!-- TOP ROW: BRIEFING + CHALLENGE + TIP -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;">
+
+    <!-- AI BRIEFING -->
+    <div class="briefing-card" id="briefing-card" style="margin-bottom:0;">
+      <div class="briefing-header">
+        <div class="briefing-dot"></div>
+        <div class="briefing-label">Morning Briefing</div>
+      </div>
+      <div class="briefing-text" id="briefing-text">Tap below to generate your briefing.</div>
+      <button class="briefing-btn" onclick="generateBriefing()">⚡ Generate</button>
+    </div>
+
+    <!-- MOTIVATIONAL CHALLENGE -->
+    <div style="background:rgba(48,209,88,0.08);border:0.5px solid rgba(48,209,88,0.25);border-radius:22px;padding:18px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <div style="width:7px;height:7px;border-radius:50%;background:#30D158;"></div>
+        <div style="font-size:11px;font-weight:700;color:#30D158;letter-spacing:0.5px;text-transform:uppercase;">Daily Challenge</div>
+      </div>
+      <div id="daily-challenge" style="font-size:15px;line-height:1.6;color:rgba(255,255,255,0.88);font-weight:500;"></div>
+    </div>
+
+    <!-- AME TIP -->
+    <div style="background:rgba(255,159,10,0.08);border:0.5px solid rgba(255,159,10,0.25);border-radius:22px;padding:18px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <div style="width:7px;height:7px;border-radius:50%;background:#FF9F0A;"></div>
+        <div style="font-size:11px;font-weight:700;color:#FF9F0A;letter-spacing:0.5px;text-transform:uppercase;">AME Tip</div>
+      </div>
+      <div id="ame-tip" style="font-size:15px;line-height:1.6;color:rgba(255,255,255,0.88);font-weight:500;"></div>
+    </div>
+
+  </div>
+
+  <!-- CARDS -->
+  <div class="cards-grid">
+    <!-- WEATHER -->
+    <div class="card">
+      <button class="refresh-btn" onclick="fetchWeather()" title="Refresh weather">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 4v6h6M23 20v-6h-6"/>
+          <path d="M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15"/>
+        </svg>
+      </button>
+      <div class="card-label">Winnipeg, MB</div>
+      <div class="weather-temp" id="weather-temp">--°</div>
+      <div class="weather-desc" id="weather-desc">Loading...</div>
+      <div class="weather-details">
+        <div class="weather-detail" id="weather-wind">--</div>
+        <div class="weather-detail" id="weather-humidity">--</div>
+      </div>
+    </div>
+
+    <!-- TODAY & UPCOMING EVENTS -->
+    <div class="card">
+      <div class="card-label">Today & Upcoming</div>
+      <ul class="events-list" id="today-events">
+        <li class="empty-events">No events today</li>
+      </ul>
+      <div id="upcoming-strip" style="margin-top:8px;"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CALENDAR PAGE -->
+<div class="page" id="page-calendar" style="padding-top:16px;">
+
+  <!-- Calendar Nav -->
+  <div class="cal-nav" style="margin-bottom:12px;">
+    <button class="cal-arrow" onclick="changeMonth(-1)">&#8592;</button>
+    <div class="cal-month" id="cal-month-label">April 2025</div>
+    <button class="cal-arrow" onclick="changeMonth(1)">&#8594;</button>
+  </div>
+
+  <!-- Calendar Grid - compact to fit full month -->
+  <div class="cal-grid" id="cal-grid" style="gap:2px;margin-bottom:12px;">
+    <div class="cal-day-header">SUN</div>
+    <div class="cal-day-header">MON</div>
+    <div class="cal-day-header">TUE</div>
+    <div class="cal-day-header">WED</div>
+    <div class="cal-day-header">THU</div>
+    <div class="cal-day-header">FRI</div>
+    <div class="cal-day-header">SAT</div>
+  </div>
+
+  <!-- Day Detail View -->
+  <div id="day-detail" style="display:none;background:rgba(28,28,30,0.94);border:0.5px solid rgba(255,255,255,0.14);border-radius:22px;padding:16px;margin-bottom:12px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div id="day-detail-title" style="font-size:16px;font-weight:800;color:#fff;"></div>
+      <button onclick="closeDayDetail()" style="background:rgba(44,44,46,0.8);border:none;border-radius:50%;color:rgba(255,255,255,0.5);font-size:18px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
+    </div>
+    <div id="day-detail-events"></div>
+  </div>
+
+  <!-- All Events List -->
+  <div class="events-section">
+    <div class="section-title">// ALL EVENTS</div>
+    <div id="all-events-list">
+      <div class="empty-events">No events yet. Tap + to add one.</div>
+    </div>
+  </div>
+
+  <!-- Floating Add Button -->
+  <button onclick="openAddModal()" style="position:fixed;bottom:90px;right:20px;width:56px;height:56px;border-radius:50%;background:#0A84FF;border:none;color:#fff;font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:50;box-shadow:0 4px 20px rgba(10,132,255,0.4);touch-action:manipulation;">+</button>
+</div>
+
+<!-- ADD EVENT MODAL -->
+<div id="add-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);z-index:200;align-items:flex-end;justify-content:center;">
+  <div style="background:#1c1c1e;border-radius:22px 22px 0 0;padding:20px;width:100%;max-width:800px;border-top:0.5px solid rgba(255,255,255,0.14);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-size:17px;font-weight:800;color:#fff;">Add Event</div>
+      <button onclick="closeAddModal()" style="background:rgba(44,44,46,0.8);border:none;border-radius:50%;color:rgba(255,255,255,0.5);font-size:20px;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:12px;background:rgba(44,44,46,0.8);padding:4px;border-radius:13px;">
+      <button onclick="setType('event')" id="type-event" style="flex:1;padding:10px;border-radius:10px;border:none;background:#0A84FF;color:#fff;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:40px;">EVENT</button>
+      <button onclick="setType('reminder')" id="type-reminder" style="flex:1;padding:10px;border-radius:10px;border:none;background:transparent;color:rgba(255,255,255,0.4);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;min-height:40px;">REMINDER</button>
+    </div>
+
+    <div style="margin-bottom:10px;">
+      <input type="text" class="form-input" id="event-title" placeholder="Title...">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+      <input type="date" class="form-input" id="event-date">
+      <input type="time" class="form-input" id="event-time">
+    </div>
+    <div style="margin-bottom:14px;">
+      <input type="text" class="form-input" id="event-notes" placeholder="Notes (optional)...">
+    </div>
+    <button class="submit-btn" onclick="addEvent()">Add to Calendar</button>
+  </div>
+</div>
+
+<!-- CHAT PAGE -->
+<div class="page" id="page-chat" style="padding-top: 56px;">
+  <div class="model-status">
+    <div class="status-dot" id="status-dot"></div>
+    <div class="status-text" id="status-text">Checking Ollama...</div>
+  </div>
+
+  <div class="chat-container">
+    <div class="chat-messages" id="chat-messages">
+      <div class="message assistant">
+        <div class="message-label">AI ASSISTANT</div>
+        <div class="message-bubble">Hey Yosief. What do you need?</div>
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <textarea class="chat-input" id="chat-input" placeholder="Ask anything..." rows="1"
+        onkeydown="handleChatKey(event)"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMessage()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav>
+  <button class="nav-btn" id="nav-calendar" onclick="showPage('calendar')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+      <line x1="16" y1="2" x2="16" y2="6"/>
+      <line x1="8" y1="2" x2="8" y2="6"/>
+      <line x1="3" y1="10" x2="21" y2="10"/>
+    </svg>
+    CALENDAR
+  </button>
+  <button class="nav-btn active" id="nav-home" onclick="showPage('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+      <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+    HOME
+  </button>
+  <button class="nav-btn" id="nav-chat" onclick="showPage('chat')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+    </svg>
+    CHAT
+  </button>
+</nav>
+
+<script>
+// ===== STATE =====
+let events = JSON.parse(localStorage.getItem('dashboard-events') || '[]');
+let currentEventType = 'event';
+let calYear, calMonth, selectedDate;
+const today = new Date();
+calYear = today.getFullYear();
+calMonth = today.getMonth();
+
+// ===== NAVIGATION =====
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('nav-' + page).classList.add('active');
+  if (page === 'calendar') renderCalendar();
+  if (page === 'chat') checkOllama();
+}
+
+// ===== CLOCK =====
+function updateClock() {
+  const now = new Date();
+  let h = now.getHours();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  const m = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById('clock').textContent = h + ':' + m + ' ' + ampm;
+
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('date-display').textContent =
+    days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate() + ' ' + now.getFullYear();
+
+  const hr = now.getHours();
+  let greet = hr < 12 ? 'GOOD MORNING' : hr < 17 ? 'GOOD AFTERNOON' : 'GOOD EVENING';
+  document.getElementById('greeting').textContent = greet + ', YOSIEF';
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+
+// ===== WEATHER =====
+const WMO_CODES = {
+  0:'Clear sky', 1:'Mostly clear', 2:'Partly cloudy', 3:'Overcast',
+  45:'Foggy', 48:'Icy fog', 51:'Light drizzle', 53:'Drizzle', 55:'Heavy drizzle',
+  61:'Light rain', 63:'Rain', 65:'Heavy rain', 71:'Light snow', 73:'Snow', 75:'Heavy snow',
+  77:'Snow grains', 80:'Light showers', 81:'Showers', 82:'Heavy showers',
+  85:'Snow showers', 86:'Heavy snow showers', 95:'Thunderstorm', 96:'Thunderstorm w/ hail', 99:'Thunderstorm w/ heavy hail'
+};
+
+async function fetchWeather() {
+  try {
+    // Winnipeg coords
+    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=49.8951&longitude=-97.1384&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m&temperature_unit=celsius&windspeed_unit=kmh');
+    const data = await res.json();
+    const c = data.current;
+    document.getElementById('weather-temp').textContent = Math.round(c.temperature_2m) + '°C';
+    document.getElementById('weather-desc').textContent = WMO_CODES[c.weathercode] || 'Unknown';
+    document.getElementById('weather-wind').textContent = '💨 ' + Math.round(c.windspeed_10m) + ' km/h';
+    document.getElementById('weather-humidity').textContent = '💧 ' + c.relativehumidity_2m + '%';
+  } catch(e) {
+    document.getElementById('weather-desc').textContent = 'Offline';
+  }
+}
+
+fetchWeather();
+setInterval(fetchWeather, 10 * 60 * 1000); // refresh every 10 min
+
+// ===== TODAY EVENTS =====
+function renderTodayEvents() {
+  const todayStr = today.toISOString().split('T')[0];
+  const todayEvents = events
+    .filter(e => e.date === todayStr)
+    .sort((a,b) => a.time.localeCompare(b.time));
+
+  const el = document.getElementById('today-events');
+  if (todayEvents.length === 0) {
+    el.innerHTML = '<li class="empty-events">No events today</li>';
+    return;
+  }
+
+  el.innerHTML = todayEvents.map(e => `
+    <li class="event-item">
+      <div class="event-dot ${e.type === 'reminder' ? 'reminder' : ''}"></div>
+      <div class="event-time">${e.time || '--:--'}</div>
+      <div class="event-title">${e.title}</div>
+    </li>
+  `).join('');
+}
+
+renderTodayEvents();
+renderUpcomingStrip();
+
+// ===== CALENDAR =====
+function renderCalendar() {
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month-label').textContent = months[calMonth] + ' ' + calYear;
+
+  const grid = document.getElementById('cal-grid');
+  // Remove old day cells (keep headers)
+  const headers = grid.querySelectorAll('.cal-day-header');
+  grid.innerHTML = '';
+  headers.forEach(h => grid.appendChild(h));
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const daysInPrev = new Date(calYear, calMonth, 0).getDate();
+
+  // Prev month days
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const d = document.createElement('div');
+    d.className = 'cal-day other-month';
+    d.textContent = daysInPrev - i;
+    grid.appendChild(d);
+  }
+
+  // Current month days
+  for (let d = 1; d <= daysInMonth; d++) {
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    el.textContent = d;
+
+    const dateStr = calYear + '-' + String(calMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    if (d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear())
+      el.classList.add('today');
+    if (events.some(e => e.date === dateStr))
+      el.classList.add('has-event');
+    if (selectedDate === dateStr)
+      el.classList.add('selected');
+
+    el.onclick = () => {
+      selectedDate = dateStr;
+      document.getElementById('event-date').value = dateStr;
+      renderCalendar();
+      showDayDetail(dateStr);
+    };
+
+    grid.appendChild(el);
+  }
+
+  // Next month padding
+  const total = firstDay + daysInMonth;
+  const remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (let i = 1; i <= remaining; i++) {
+    const d = document.createElement('div');
+    d.className = 'cal-day other-month';
+    d.textContent = i;
+    grid.appendChild(d);
+  }
+
+  renderAllEvents();
+}
+
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+}
+
+// ===== EVENTS =====
+function setType(type) {
+  currentEventType = type;
+  const evBtn = document.getElementById('type-event');
+  const remBtn = document.getElementById('type-reminder');
+  evBtn.style.background = type === 'event' ? '#0A84FF' : 'transparent';
+  evBtn.style.color = type === 'event' ? '#fff' : 'rgba(255,255,255,0.4)';
+  remBtn.style.background = type === 'reminder' ? '#FF9F0A' : 'transparent';
+  remBtn.style.color = type === 'reminder' ? '#fff' : 'rgba(255,255,255,0.4)';
+}
+
+function addEvent() {
+  const title = document.getElementById('event-title').value.trim();
+  const date = document.getElementById('event-date').value;
+  const time = document.getElementById('event-time').value;
+  const notes = document.getElementById('event-notes').value.trim();
+
+  if (!title || !date) { showToast('Title and date are required'); return; }
+
+  events.push({ id: Date.now(), title, date, time, notes, type: currentEventType });
+  saveEvents();
+  renderTodayEvents();
+  renderCalendar();
+  closeAddModal();
+  showToast('Event added!');
+
+  document.getElementById('event-title').value = '';
+  document.getElementById('event-notes').value = '';
+  document.getElementById('event-time').value = '';
+}
+
+function deleteEvent(id) {
+  events = events.filter(e => e.id !== id);
+  saveEvents();
+  renderTodayEvents();
+  renderCalendar();
+  showToast('Event deleted');
+}
+
+function saveEvents() {
+  localStorage.setItem('dashboard-events', JSON.stringify(events));
+  renderUpcomingStrip();
+}
+
+function renderAllEvents() {
+  const el = document.getElementById('all-events-list');
+  const sorted = [...events].sort((a,b) => {
+    if (a.date !== b.date) return a.date.localeCompare(b.date);
+    return a.time.localeCompare(b.time);
+  });
+
+  if (sorted.length === 0) {
+    el.innerHTML = '<div class="empty-events">No events yet. Add one above.</div>';
+    return;
+  }
+
+  el.innerHTML = sorted.map(e => `
+    <div class="event-card ${e.type === 'reminder' ? 'reminder' : ''}">
+      <div class="event-card-info">
+        <div class="event-card-title">${e.title}</div>
+        <div class="event-card-meta">${e.date}${e.time ? ' @ ' + e.time : ''} &nbsp;·&nbsp; ${e.type.toUpperCase()}${e.notes ? ' &nbsp;·&nbsp; ' + e.notes : ''}</div>
+      </div>
+      <button class="delete-btn" onclick="deleteEvent(${e.id})" title="Delete">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+        </svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+// ===== MORNING BRIEFING =====
+async function generateBriefing() {
+  const todayStr = today.toISOString().split('T')[0];
+  const todayEvents = events.filter(e => e.date === todayStr);
+  const eventSummary = todayEvents.length > 0
+    ? todayEvents.map(e => `${e.type}: "${e.title}" at ${e.time || 'no specific time'}`).join(', ')
+    : 'no events scheduled';
+
+  const prompt = `Give a brief morning briefing for Yosief. Today is ${todayStr}. Events today: ${eventSummary}. Keep it under 3 sentences. Be direct and warm.`;
+
+  document.getElementById('briefing-text').textContent = 'Generating...';
+
+  try {
+    const res = await fetch('http://localhost:11434/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'llama3.2:1b', prompt, stream: false })
+    });
+    const data = await res.json();
+    document.getElementById('briefing-text').textContent = data.response;
+  } catch(e) {
+    document.getElementById('briefing-text').textContent = 'Could not connect to Ollama. Make sure it is running.';
+  }
+}
+
+// ===== CHAT =====
+let chatHistory = [];
+
+async function checkOllama() {
+  try {
+    const res = await fetch('http://localhost:11434/api/tags');
+    if (res.ok) {
+      document.getElementById('status-dot').className = 'status-dot online';
+      document.getElementById('status-text').textContent = 'llama3.2:1b · Online';
+    }
+  } catch(e) {
+    document.getElementById('status-text').textContent = 'Ollama offline — run: ollama serve';
+  }
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  input.value = '';
+  appendMessage('user', msg);
+
+  const thinking = document.createElement('div');
+  thinking.className = 'message assistant';
+  thinking.id = 'thinking';
+  thinking.innerHTML = '<div class="message-label">AI ASSISTANT</div><div class="thinking"><span></span><span></span><span></span></div>';
+  document.getElementById('chat-messages').appendChild(thinking);
+  scrollChat();
+
+  document.getElementById('send-btn').disabled = true;
+
+  chatHistory.push({ role: 'user', content: msg });
+
+  try {
+    const res = await fetch('http://localhost:11434/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'llama3.2:1b',
+        messages: chatHistory,
+        stream: false
+      })
+    });
+    const data = await res.json();
+    const reply = data.message.content;
+    chatHistory.push({ role: 'assistant', content: reply });
+    document.getElementById('thinking').remove();
+    appendMessage('assistant', reply);
+  } catch(e) {
+    document.getElementById('thinking').remove();
+    appendMessage('assistant', 'Error: Could not reach Ollama. Make sure it is running.');
+  }
+
+  document.getElementById('send-btn').disabled = false;
+}
+
+function appendMessage(role, content) {
+  const el = document.createElement('div');
+  el.className = 'message ' + role;
+  el.innerHTML = `
+    <div class="message-label">${role === 'user' ? 'YOU' : 'AI ASSISTANT'}</div>
+    <div class="message-bubble">${content.replace(/\n/g, '<br>')}</div>
+  `;
+  document.getElementById('chat-messages').appendChild(el);
+  scrollChat();
+}
+
+function scrollChat() {
+  const msgs = document.getElementById('chat-messages');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+
+
+// ===== ADD EVENT MODAL =====
+function openAddModal() {
+  const overlay = document.getElementById('add-modal-overlay');
+  overlay.style.display = 'flex';
+  setTimeout(() => overlay.querySelector('div').style.transform = 'translateY(0)', 10);
+}
+
+function closeAddModal() {
+  document.getElementById('add-modal-overlay').style.display = 'none';
+}
+
+// Close modal when tapping overlay background
+document.getElementById('add-modal-overlay').addEventListener('touchstart', function(e) {
+  if (e.target === this) closeAddModal();
+});
+
+// ===== DAY DETAIL VIEW =====
+function showDayDetail(dateStr) {
+  const dayEvents = events.filter(e => e.date === dateStr).sort((a,b) => a.time.localeCompare(b.time));
+  const d = new Date(dateStr + 'T00:00:00');
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  
+  document.getElementById('day-detail-title').textContent = days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate();
+  
+  const container = document.getElementById('day-detail-events');
+  if (dayEvents.length === 0) {
+    container.innerHTML = '<div class="empty-events">No events this day</div>';
+  } else {
+    container.innerHTML = dayEvents.map(e => `
+      <div class="event-card ${e.type === 'reminder' ? 'reminder' : ''}" style="margin-bottom:8px;">
+        <div class="event-card-info">
+          <div class="event-card-title">${e.title}</div>
+          <div class="event-card-meta">${e.time ? e.time + ' · ' : ''}${e.type.toUpperCase()}${e.notes ? ' · ' + e.notes : ''}</div>
+        </div>
+        <button class="delete-btn" onclick="deleteEvent(${e.id})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/>
+          </svg>
+        </button>
+      </div>
+    `).join('');
+  }
+  document.getElementById('day-detail').style.display = 'block';
+}
+
+function closeDayDetail() {
+  document.getElementById('day-detail').style.display = 'none';
+}
+
+// ===== UPCOMING STRIP =====
+function renderUpcomingStrip() {
+  const todayStr = today.toISOString().split('T')[0];
+  const upcoming = events
+    .filter(e => e.date > todayStr)
+    .sort((a,b) => a.date !== b.date ? a.date.localeCompare(b.date) : a.time.localeCompare(b.time))
+    .slice(0, 5);
+
+  const strip = document.getElementById('upcoming-strip');
+  if (!strip) return;
+
+  if (upcoming.length === 0) { strip.innerHTML = ''; return; }
+
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  strip.innerHTML = '<div style="height:0.5px;background:rgba(255,255,255,0.08);margin:8px 0;"></div>' +
+    '<div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Upcoming</div>' +
+    upcoming.map(e => {
+      const d = new Date(e.date + "T00:00:00");
+      const color = e.type === "reminder" ? "#FF9F0A" : "#0A84FF";
+      return '<div style="display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:0.5px solid rgba(255,255,255,0.06);">' +
+        '<div style="width:6px;height:6px;border-radius:50%;background:' + color + ';flex-shrink:0;margin-top:5px;"></div>' +
+        '<div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);flex-shrink:0;width:40px;">' + months[d.getMonth()] + ' ' + d.getDate() + '</div>' +
+        '<div style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.85);">' + e.title + (e.time ? ' · ' + e.time : '') + '</div>' +
+        '</div>';
+    }).join('');
+}
+
+// ===== QUICK ADD =====
+let quickEventType = "event";
+
+function quickSetType(type) {
+  quickEventType = type;
+  document.getElementById("qt-event").style.background = type === "event" ? "#0A84FF" : "rgba(44,44,46,0.8)";
+  document.getElementById("qt-event").style.color = type === "event" ? "#fff" : "rgba(255,255,255,0.4)";
+  document.getElementById("qt-reminder").style.background = type === "reminder" ? "#FF9F0A" : "rgba(44,44,46,0.8)";
+  document.getElementById("qt-reminder").style.color = type === "reminder" ? "#fff" : "rgba(255,255,255,0.4)";
+}
+
+function quickAddEvent() {
+  const title = document.getElementById("quick-title").value.trim();
+  const time = document.getElementById("quick-time").value;
+  const date = document.getElementById("quick-date").value || today.toISOString().split("T")[0];
+  if (!title) { showToast("Enter a title"); return; }
+  events.push({ id: Date.now(), title, date, time, notes: "", type: quickEventType });
+  saveEvents();
+  renderTodayEvents();
+  renderUpcomingStrip();
+  showToast("Added!");
+  document.getElementById("quick-title").value = "";
+  document.getElementById("quick-time").value = "";
+}
+
+// ===== QUICK NOTES =====
+function saveNotes() {
+  localStorage.setItem("dashboard-notes", document.getElementById("quick-notes").value);
+}
+
+function clearNotes() {
+  document.getElementById("quick-notes").value = "";
+  localStorage.removeItem("dashboard-notes");
+  showToast("Notes cleared");
+}
+
+function loadNotes() {
+  const saved = localStorage.getItem("dashboard-notes");
+  if (saved) document.getElementById("quick-notes").value = saved;
+}
+
+loadNotes();
+
+// ===== DAILY CHALLENGE =====
+const DAILY_CHALLENGES = [
+  "Drink 8 glasses of water today and track each one.",
+  "Do 10 minutes of deep breathing or meditation this morning.",
+  "Go for a 20 minute walk outside before or after work.",
+  "Write down 3 things you are grateful for right now.",
+  "Do 3 sets of 15 pushups throughout the day.",
+  "Eat a vegetable with every meal today.",
+  "Spend 10 minutes stretching before bed tonight.",
+  "Put your phone away 1 hour before sleeping.",
+  "Do 20 squats every hour you are awake today.",
+  "Drink a glass of water before every meal.",
+  "Take a 10 minute walk after lunch.",
+  "Journal for 5 minutes about how you are feeling.",
+  "Do a full body stretch for 15 minutes this morning.",
+  "Eat a piece of fruit for your morning snack.",
+  "Go to bed 30 minutes earlier than usual tonight.",
+  "Do 50 jumping jacks before you start your day.",
+  "Take 5 slow deep breaths every hour today.",
+  "Cook a healthy meal at home instead of ordering out.",
+  "Do a 15 minute yoga or stretching session today.",
+  "Spend 10 minutes outside in natural light this morning.",
+  "Avoid caffeine after 2pm today and track your sleep.",
+  "Do 3 sets of 10 pull-ups or body rows today.",
+  "Eat breakfast within 30 minutes of waking up.",
+  "Take the stairs instead of the elevator all day.",
+  "Spend 20 minutes on a hobby that relaxes your mind.",
+  "Do 30 seconds of cold water at the end of your shower.",
+  "Write down one worry and then let it go consciously.",
+  "Do a 10 minute mindfulness body scan before bed.",
+  "Limit social media to 30 minutes total today.",
+  "Drink herbal tea instead of a second coffee today.",
+  "Do 20 lunges in the morning and 20 more in the evening.",
+  "Eat slowly and without screens for every meal today.",
+  "Spend 15 minutes reading something just for pleasure.",
+  "Do a 20 minute jog or brisk walk today.",
+  "Write down 5 positive things about yourself.",
+  "Take a full rest day and let your body recover.",
+  "Do 3 sets of 20 crunches or core exercises today.",
+  "Prepare your meals the night before to eat healthier.",
+  "Spend time in silence for 10 minutes with no distractions.",
+  "Do a digital detox for 2 hours this evening.",
+  "Foam roll or massage tight muscles for 10 minutes.",
+  "Eat a high protein breakfast to fuel your day.",
+  "Stand up and move for 5 minutes every hour.",
+  "Do 15 minutes of light cardio to boost your mood.",
+  "Write down one thing you are proud of about your body.",
+  "Take a nap for 20 minutes if you feel fatigued.",
+  "Avoid processed sugar for the entire day.",
+  "Do 3 sets of 15 glute bridges before bed.",
+  "Spend 10 minutes in fresh air before starting work.",
+  "Practice gratitude by thanking someone in person today.",
+  "Do a 20 minute workout focused on your weak muscle groups.",
+  "Hydrate with an electrolyte drink after any physical activity.",
+  "Spend 15 minutes doing something creative with your hands.",
+  "Go to bed at a consistent time tonight and every night this week.",
+  "Do 30 second plank holds for 5 sets during the day.",
+  "Eat a handful of nuts as a snack instead of chips.",
+  "Call or message someone you care about just to check in.",
+  "Do a 10 minute breathing exercise for stress relief.",
+  "Avoid alcohol today and drink water instead.",
+  "Spend 20 minutes in a green space or park today.",
+  "Do a shoulder and neck stretch every hour at work.",
+  "Write about a challenge you overcame and what it taught you.",
+  "Practice box breathing — 4 seconds in, hold 4, out 4, hold 4.",
+  "Eat more fiber today — oats, beans, fruits, or vegetables.",
+  "Do a 15 minute evening walk to decompress after work.",
+  "Spend 10 minutes decluttering your space for mental clarity.",
+  "Try one new healthy food or recipe you have never had.",
+  "Do 3 sets of tricep dips or shoulder presses today.",
+  "Write down what your body needs most right now.",
+  "Listen to calming music for 20 minutes before bed.",
+  "Do a full assessment of your posture and correct it consciously.",
+  "Take a 5 minute break for every 45 minutes of screen time.",
+  "Eat more leafy greens today in any form.",
+  "Do a 15 minute guided meditation using any free app.",
+  "Write down your energy levels hourly and spot your peak time.",
+  "Do a 30 minute swim, cycle, or low impact cardio session.",
+  "Plan tomorrow's meals tonight to avoid impulsive choices.",
+  "Spend 10 minutes doing something that makes you laugh.",
+  "Do a wrist, forearm, and hand stretch after tool work.",
+  "Drink a glass of warm lemon water first thing this morning.",
+  "Do 3 sets of 12 dips or chest exercises today.",
+  "Write down three fears and the first small step to face each.",
+  "Go outside to watch the sunrise or sunset today.",
+  "Do a 20 minute dance session to your favourite music.",
+  "Avoid complaining for an entire day and notice the shift.",
+  "Spend 15 minutes reading about nutrition or wellness.",
+  "Do a 10 minute hip flexor stretch after sitting for long periods.",
+  "Eat a balanced plate — protein, carb, fat, and vegetables.",
+  "Do 10 minutes of journaling to process your thoughts.",
+  "Spend 20 minutes on a sport or physical activity you enjoy.",
+  "Write down one boundary you will set to protect your energy.",
+  "Do 3 sets of 15 lateral raises for shoulder health.",
+  "Limit news consumption to 15 minutes today.",
+  "Spend 30 minutes cooking from scratch with whole ingredients.",
+  "Do a breathing exercise before any stressful task today.",
+  "Nourish your body with a smoothie packed with fruit and greens.",
+  "Do a 15 minute mindful walk with no phone and no music.",
+  "Write down what brings you the most peace and do that today.",
+  "Spend 20 minutes foam rolling your legs and back.",
+  "Practice saying no to something that drains your energy.",
+  "Do 3 sets of 10 pull aparts with a resistance band.",
+  "Eat dinner at least 2 hours before you go to sleep.",
+  "Spend 10 minutes in the sun to boost your vitamin D.",
+  "Do a 15 minute stretching routine focused on your hips.",
+  "Write down one unhealthy habit and your plan to reduce it.",
+  "Drink 500ml of water immediately after waking up.",
+  "Do a 10 minute core stability workout on the floor.",
+  "Spend time doing a breathing exercise to lower your heart rate.",
+  "Eat less sodium today — track your food labels.",
+  "Do a 20 minute hike or walk on uneven terrain.",
+  "Write down one way you will invest in your health this month.",
+  "Do 3 sets of calf raises to improve lower leg strength.",
+  "Sleep with your room completely dark and cool tonight.",
+  "Spend 10 minutes practicing gratitude journaling before bed.",
+  "Do a 15 minute stretching focus on your thoracic spine.",
+  "Eat an extra serving of protein with every meal today.",
+  "Do a 10 minute breathing meditation after waking up.",
+  "Spend 15 minutes outside away from screens and noise.",
+  "Write down three things that restore your mental energy.",
+  "Do 20 minutes of any physical movement you enjoy today.",
+  "Take a cold face wash in the morning to boost alertness.",
+  "Spend 10 minutes visualizing a successful and healthy future.",
+  "Do a 3 minute plank challenge at your personal max today.",
+  "Eat mindfully — no phone, no TV, just your meal.",
+  "Write a self compassion letter to yourself about a tough week.",
+  "Do a full body mobility routine for 15 minutes.",
+  "Spend 20 minutes on something creative just for fun.",
+  "Avoid snacking between meals and notice your hunger levels.",
+  "Do a 10 minute breathing exercise to reset your nervous system.",
+  "Write about how you want to feel physically in 6 months.",
+  "Spend 30 minutes doing something active with someone else.",
+  "Do a shoulder mobility routine to counteract desk or tool work.",
+  "Eat breakfast that has protein, fat, and complex carbs.",
+  "Practice saying one positive affirmation aloud each morning.",
+  "Do 15 minutes of low intensity cardio after dinner.",
+  "Spend 10 minutes stretching your pectoral muscles and chest.",
+  "Write down 5 healthy habits you want to make automatic.",
+  "Do a 20 minute yoga flow to improve flexibility.",
+  "Eat more whole foods and fewer ingredients with added sugar.",
+  "Take a 20 minute power nap if your body is asking for rest.",
+  "Do 3 sets of 15 face pulls for rotator cuff health.",
+  "Spend 15 minutes tracking your mood and energy today.",
+  "Avoid scrolling in bed — put your phone across the room tonight.",
+  "Do a 10 minute guided relaxation before sleep.",
+  "Write one affirmation about your physical and mental strength.",
+  "Spend 20 minutes learning about a health topic you are curious about.",
+  "Do a 5 minute balance workout on one leg for stability.",
+  "Eat a proper breakfast — no skipping to save energy all day.",
+  "Do a stretch for every major muscle group today.",
+  "Write about a moment when you felt truly healthy and strong.",
+  "Spend 15 minutes unplugged and enjoying quiet time.",
+  "Do a 10 minute core routine focused on anti-rotation.",
+  "Eat more colourful vegetables — aim for 5 different colours.",
+  "Drink water before, during, and after any physical activity.",
+  "Do a 20 minute walk in nature and breathe consciously.",
+  "Write down your current health goals and review your progress.",
+  "Spend 15 minutes doing something that feeds your soul.",
+  "Do 3 sets of hamstring curls or hip hinges today.",
+  "Avoid ultra-processed foods for the entire day.",
+  "Do a 10 minute gratitude practice before starting work.",
+  "Spend 20 minutes doing breathwork to reduce stress cortisol.",
+  "Write one kind thing you will do for your body today.",
+  "Do a 15 minute posture reset — chin tucks, rows, and hinges.",
+  "Eat slowly and chew each bite 20 times to aid digestion.",
+  "Spend 10 minutes laughing — watch something funny.",
+  "Do a 20 minute indoor cycling or rowing session.",
+  "Write down all the ways your body supports and serves you.",
+  "Spend 15 minutes learning a relaxation technique.",
+  "Do 3 sets of 12 step-ups for lower body strength.",
+  "Eat a high fibre snack — apple, almonds, or carrots.",
+  "Do a 10 minute shoulder and upper back stretch.",
+  "Spend time reflecting on how far you have come physically.",
+  "Write a 5 year health vision and what it will feel like.",
+  "Do a 20 minute outdoor workout using only bodyweight.",
+  "Limit screen brightness in the evening to protect sleep quality.",
+  "Spend 15 minutes working on a physical skill like balance.",
+  "Do a breathing reset — 6 slow breaths per minute for 5 minutes.",
+  "Eat less and slower at dinner tonight.",
+  "Write down three small wins for your health this week.",
+  "Do a 10 minute stretching session specifically for your back.",
+  "Spend 20 minutes on a long and slow walk to decompress.",
+  "Avoid checking your phone in the first 30 minutes of your day.",
+  "Do a 15 minute foam roll and stretch after any workout.",
+  "Eat more omega-3 rich foods today — salmon, walnuts, or flaxseed.",
+  "Spend 10 minutes doing progressive muscle relaxation.",
+  "Write about what your ideal energy levels look and feel like.",
+  "Do 3 sets of 10 single leg deadlifts for balance.",
+  "Prioritize sleep tonight — aim for 7 to 9 hours.",
+  "Spend 10 minutes journaling without any goal or structure.",
+  "Do a 20 minute swim or water workout if available.",
+  "Eat a colourful salad for one meal today.",
+  "Practice slow nasal breathing throughout your workday.",
+  "Do a 15 minute shoulder press and row superset.",
+  "Spend 15 minutes visualizing yourself at peak health.",
+  "Write one thing your mental health needs more of this week.",
+  "Do 10 minutes of wrist and forearm stretching after tool use.",
+  "Eat dinner before 7pm tonight to improve digestion.",
+  "Spend 20 minutes doing a relaxing bedtime routine.",
+  "Do a 15 minute HIIT session to boost your metabolism.",
+  "Drink green tea instead of coffee for one meal today.",
+  "Write down everything you ate yesterday and evaluate it.",
+  "Spend 10 minutes practicing slow controlled breathing.",
+  "Do 3 sets of 20 band pull-aparts for shoulder health.",
+  "Take a proper rest day — no guilt, just recovery.",
+  "Spend 15 minutes reading about mental health.",
+  "Do a 10 minute mindfulness meditation with eyes open.",
+  "Eat a high antioxidant meal — berries, dark greens, or beans.",
+  "Write one intention for your mental and physical health today.",
+  "Do a 20 minute outdoor jog or bike ride.",
+  "Avoid eating in front of screens for all meals today.",
+  "Spend 10 minutes doing joint mobility work.",
+  "Do 3 sets of 12 Romanian deadlifts for posterior chain.",
+  "Write about a time your mental strength helped you physically.",
+  "Spend 15 minutes in a hot shower or bath to relax muscles.",
+  "Do a 10 minute breathing exercise after a stressful moment.",
+  "Eat more magnesium rich foods — dark chocolate, seeds, or nuts.",
+  "Spend 20 minutes doing something playful or childlike.",
+  "Do a 15 minute stretching focus on hip flexors and quads.",
+  "Write down your sleep schedule and commit to it this week.",
+  "Do 3 sets of 15 banded clamshells for glute health.",
+  "Drink a full litre of water before noon today.",
+  "Spend 10 minutes doing nothing — no phone, no input.",
+  "Do a 20 minute evening walk to settle your nervous system.",
+  "Eat one meal today that is entirely whole food plant-based.",
+  "Write about what rest means to you and do one restful thing.",
+  "Do a 15 minute hip and spine mobility flow.",
+  "Spend 15 minutes in sunlight — morning light resets your clock.",
+  "Do 3 sets of 10 push-up variations to challenge your chest.",
+  "Avoid negative self-talk for an entire day — catch it and flip it.",
+  "Spend 20 minutes doing a creative or artistic activity.",
+  "Do a 10 minute breathing meditation to start your workday.",
+  "Eat more zinc rich foods today — pumpkin seeds, beef, or lentils.",
+  "Write about your relationship with rest and how to improve it.",
+  "Do a 20 minute full body stretch before bed tonight.",
+  "Spend 15 minutes practicing a mindfulness technique.",
+  "Do 3 sets of 15 rear delt flies for shoulder balance.",
+  "Prepare one healthy batch meal for the rest of the week.",
+  "Spend 10 minutes in silence just focusing on your breath.",
+  "Do a 15 minute hip mobility routine to reduce stiffness.",
+  "Eat more iron rich foods today — lean red meat, spinach, or lentils.",
+  "Write about what makes you feel truly alive and energized.",
+  "Do a 20 minute stress reduction activity of your choice.",
+  "Spend 15 minutes planning your meals for the next 3 days.",
+  "Do 3 sets of 12 split squats to build single leg strength.",
+  "Drink water with every meal and limit sugary drinks all day.",
+  "Spend 10 minutes doing a body appreciation practice.",
+  "Do a 15 minute guided progressive relaxation before sleep.",
+  "Eat a balanced snack — protein plus healthy fat plus fibre.",
+  "Write one loving and encouraging message to yourself.",
+  "Do a 20 minute LISS cardio session at an easy pace.",
+  "Spend 15 minutes outside breathing fresh air consciously.",
+  "Do 3 sets of 15 face pulls with band or cable for posture.",
+  "Replace one unhealthy habit today with a healthier one.",
+  "Spend 10 minutes journaling about your emotional state.",
+  "Do a 15 minute hip hinge and deadlift pattern practice.",
+  "Eat more potassium today — banana, potato, or avocado.",
+  "Write down 10 things your body has done for you this week.",
+  "Do a 20 minute active recovery session — light walk or swim.",
+  "Spend 15 minutes in intentional stillness and quiet.",
+  "Do 3 sets of 10 single arm rows for back balance.",
+  "Avoid caffeine today and notice how your body feels.",
+  "Spend 10 minutes doing intentional breathing after work.",
+  "Do a 15 minute core and glute activation before your workout.",
+  "Eat more cruciferous vegetables today — broccoli or cauliflower.",
+  "Write one thing you will do differently for your health tomorrow.",
+  "Do a 20 minute long walk at a steady comfortable pace.",
+  "Spend 15 minutes doing a relaxation practice of your choice.",
+  "Do 3 sets of 10 assisted pistol squats for knee health.",
+  "Drink one less sugary drink this week than you normally would.",
+  "Spend 10 minutes writing about your mental energy levels.",
+  "Do a 15 minute shoulder and thoracic mobility session.",
+  "Eat a nutrient dense breakfast to set your energy for the day.",
+  "Write down one physical goal and your specific plan to reach it.",
+  "Do a 20 minute workout you have never tried before.",
+  "Spend 15 minutes in a gratitude state — feel it, do not just list it.",
+  "Do 3 sets of 10 chest supported rows for upper back health.",
+  "Avoid alcohol this week and replace it with a sparkling water.",
+  "Spend 10 minutes reading about sleep hygiene practices.",
+  "Do a 15 minute mindful stretching flow with slow breathing.",
+  "Eat more calcium today — dairy, tofu, or leafy greens.",
+  "Write about your biggest health challenge and how you will face it.",
+  "Do a 20 minute run at a conversational pace.",
+  "Spend 15 minutes doing a self-care activity just for you.",
+  "Do 3 sets of 12 Nordic hamstring curls for injury prevention.",
+  "Add one more serving of vegetables to every meal this week.",
+  "Spend 10 minutes doing a wind-down routine before sleep.",
+  "Do a 15 minute standing desk or movement break at work.",
+  "Eat more B vitamin foods — eggs, meat, legumes, or leafy greens.",
+  "Write about one habit that is draining your health and how to stop.",
+];
+
+// ===== AME TIP OF THE DAY =====
+const AME_TIPS = [
+  "Study the difference between primary and secondary flight controls.",
+  "Review how a variable pitch propeller governor maintains RPM.",
+  "Learn how aircraft pressurization systems maintain cabin altitude.",
+  "Study the function of each component in a hydraulic power pack.",
+  "Review the principles of electromagnetic induction for AC generators.",
+  "Learn the differences between series, parallel, and series-parallel circuits.",
+  "Study how a constant speed drive unit works in an IDG system.",
+  "Review the function of aircraft engine bleed air systems.",
+  "Learn the principles behind aircraft pitot-static system operation.",
+  "Study how aircraft fuel systems manage gravity and boost feed.",
+  "Review the role of the fuel control unit in turbine engine operation.",
+  "Learn how aircraft landing gear sequence valves control retraction.",
+  "Study the principles of aircraft hydraulic accumulator pre-charging.",
+  "Review how wheel anti-skid systems prevent tire skidding.",
+  "Learn the function of aircraft thrust reverser interlock systems.",
+  "Study how aircraft autopilot systems use servo actuators.",
+  "Review the principles behind aircraft air data computers.",
+  "Learn how inertial reference systems measure aircraft motion.",
+  "Study the difference between ILS localizer and glideslope systems.",
+  "Review how aircraft weather radar systems detect precipitation.",
+  "Learn how TCAS generates resolution advisories.",
+  "Study the principles of aircraft VOR navigation system operation.",
+  "Review how aircraft DME equipment calculates slant range.",
+  "Learn the function of aircraft static inverters and transformer rectifiers.",
+  "Study how aircraft nickel-cadmium batteries differ from lead-acid types.",
+  "Review aircraft bonding and shielding principles for EMI reduction.",
+  "Learn how fly-by-wire flight control systems process pilot inputs.",
+  "Study the principles behind aircraft fuel quantity capacitance systems.",
+  "Review how aircraft oxygen system regulators control flow.",
+  "Learn the difference between diluter demand and pressure demand oxygen.",
+  "Study how aircraft environmental control systems mix and condition air.",
+  "Review the function of aircraft pack flow control valves.",
+  "Learn how aircraft ram air turbines are deployed and powered.",
+  "Study the principles of aircraft de-icing boot pneumatic inflation.",
+  "Review how aircraft hot air wing leading edge anti-icing works.",
+  "Learn the function of aircraft windshield heat controllers.",
+  "Study how aircraft engine ice detection systems work.",
+  "Review the principles of aircraft fuel tank inerting systems.",
+  "Learn how aircraft cargo fire suppression agent discharge works.",
+  "Study the function of aircraft smoke detection ionization sensors.",
+  "Review how aircraft emergency evacuation slide inflation systems work.",
+  "Learn the principles of aircraft ELT activation and transmission.",
+  "Study how aircraft CVR systems record and protect flight data.",
+  "Review the function of aircraft underwater locator beacons.",
+  "Learn how aircraft EGPWS terrain databases function.",
+  "Study the principles of aircraft nose wheel steering systems.",
+  "Review how aircraft main gear truck beam pivot dampers work.",
+  "Learn the function of aircraft brake control valves.",
+  "Study how aircraft brake temperature monitoring systems work.",
+  "Review the principles of aircraft wheel bearing inspection and replacement.",
+  "Learn how aircraft flap drive systems synchronize panel movement.",
+  "Study the function of aircraft leading edge slat actuation systems.",
+  "Review how aircraft spoiler systems operate in both flight and ground modes.",
+  "Learn the principles of aircraft control surface balance and mass balance.",
+  "Study how aircraft elevator trim tab systems operate.",
+  "Review the function of aircraft rudder boost actuators.",
+  "Learn how aircraft aileron servo tabs assist pilot control forces.",
+  "Study the principles of aircraft flight control cable rigging and tensioning.",
+  "Review how aircraft yaw damper systems improve stability.",
+  "Learn the function of aircraft stick shaker systems.",
+  "Study how aircraft stall protection systems interface with flight computers.",
+  "Review the principles of aircraft APU starting and loading sequences.",
+  "Learn how APU load control valves manage electrical and bleed loads.",
+  "Study the function of aircraft engine nacelle drain mast systems.",
+  "Review how aircraft thrust management computers control autothrottle.",
+  "Learn the principles of aircraft engine trend monitoring programs.",
+  "Study how aircraft engine vibration monitoring systems detect imbalance.",
+  "Review the function of aircraft engine chip detectors.",
+  "Learn how aircraft engine oil scavenge systems work.",
+  "Study the principles of aircraft turbine engine compressor stall causes.",
+  "Review how aircraft turbine engine hot section inspection is performed.",
+  "Learn the function of aircraft fuel nozzle inspection and flow testing.",
+  "Study how aircraft turbine blade tip clearances are measured.",
+  "Review the principles of aircraft engine run-up and power checks.",
+  "Learn how aircraft engine fuel control units schedule fuel flow.",
+  "Study the function of aircraft engine pressure ratio indicating systems.",
+  "Review how aircraft engine nacelle temperature sensing works.",
+  "Learn the principles of aircraft propeller deice system operation.",
+  "Study how aircraft constant speed propeller governors function.",
+  "Review the function of aircraft propeller feathering systems.",
+  "Learn how aircraft propeller dynamic balance is performed.",
+  "Study the principles of aircraft piston engine magneto timing.",
+  "Review how aircraft carburetor heat systems prevent ice formation.",
+  "Learn the function of aircraft piston engine compression testing.",
+  "Study how aircraft piston engine oil consumption is monitored.",
+  "Review the principles of aircraft supercharger and turbocharger operation.",
+  "Learn how aircraft fuel injection systems differ from carburetors.",
+  "Study the function of aircraft engine cylinder head temperature sensors.",
+  "Review how aircraft engine exhaust gas temperature is measured.",
+  "Learn the principles of aircraft engine baffle and cowling airflow.",
+  "Study how aircraft engine mount inspection is performed after hard landings.",
+  "Review the function of aircraft powerplant firewall seals and penetrations.",
+  "Learn the principles of aircraft structural inspection for fatigue damage.",
+  "Study how aircraft lap joint inspections are performed for corrosion.",
+  "Review the function of aircraft corrosion prevention compound application.",
+  "Learn how aircraft airframe repairs are documented and approved.",
+  "Study the principles of aircraft NDT eddy current inspection.",
+  "Review how aircraft ultrasonic thickness testing is performed.",
+  "Learn the function of aircraft dye penetrant inspection.",
+  "Study the principles of aircraft magnetic particle inspection.",
+  "Review how aircraft X-ray and radiographic inspection is used.",
+  "Learn the function of aircraft borescope inspection in engine bores.",
+  "Study the principles of aircraft rivet inspection for shear and tension.",
+  "Review how aircraft bonded structure inspection is performed.",
+  "Learn the function of aircraft composite repair documentation.",
+  "Study the principles of aircraft weight and balance calculation.",
+  "Review how aircraft empty weight CG is established.",
+  "Learn the function of aircraft load planning and load sheet generation.",
+  "Study the principles of Transport Canada airworthiness directive compliance.",
+  "Review how aircraft approved maintenance organization standards apply.",
+  "Learn the function of aircraft maintenance program control and revisions.",
+  "Study the principles of aircraft minimum equipment list application.",
+  "Review how aircraft configuration deviation list items are handled.",
+  "Learn the function of aircraft deferred maintenance item tracking.",
+  "Study the principles of aircraft service bulletin embodiment procedures.",
+  "Review how aircraft engineering order documentation is processed.",
+  "Learn the function of aircraft technical log completion requirements.",
+  "Study the principles of aircraft maintenance release responsibilities.",
+  "Review how aircraft duplicate inspection requirements are applied.",
+  "Learn the function of aircraft component overhaul and life limits.",
+  "Study the principles of aircraft component traceability and certification.",
+  "Review how aircraft serviceable tag requirements are met.",
+  "Learn the function of aircraft quarantine procedures for suspect parts.",
+  "Study the principles of aircraft SDR reporting under CARs.",
+  "Review how aircraft incidents are reported and investigated.",
+  "Learn the function of aircraft fatigue management programs.",
+  "Study the principles of human factors dirty dozen in maintenance.",
+  "Review how aircraft maintenance error decision aid is applied.",
+  "Learn the function of aircraft safety management systems.",
+  "Study the principles of aircraft just culture and error reporting.",
+  "Review how aircraft maintenance task interruption procedures work.",
+  "Learn the function of aircraft job card sign-off and authorization.",
+  "Study the principles of aircraft tooling calibration control.",
+  "Review how aircraft FOD prevention programs are implemented.",
+  "Learn the function of aircraft ground handling damage reporting.",
+  "Study the principles of aircraft towing, jacking, and mooring.",
+  "Review how aircraft fuel contamination testing is performed.",
+  "Learn the function of aircraft potable water system disinfection.",
+  "Study the principles of aircraft lavatory waste system servicing.",
+  "Review how aircraft oxygen system recharge procedures are performed.",
+  "Learn the function of aircraft seat track and fitting inspection.",
+  "Study the principles of aircraft cargo tie-down rating requirements.",
+  "Review how aircraft door seal inspection and replacement is performed.",
+  "Learn the function of aircraft cockpit door strength requirements.",
+  "Study the principles of aircraft window and windshield replacement.",
+  "Review how aircraft antenna installation bonding is verified.",
+  "Learn the function of aircraft pitot heat element resistance testing.",
+  "Study the principles of aircraft transponder inspection and testing.",
+  "Review how aircraft altimeter calibration is performed.",
+  "Learn the function of aircraft compass swing after avionics work.",
+  "Study the principles of aircraft communication system output power testing.",
+  "Review how aircraft ILS antenna alignment is verified.",
+  "Learn the function of aircraft radar altimeter antenna mounting.",
+  "Study the principles of aircraft static wicks attachment and replacement.",
+  "Review how aircraft fuel tank access plate sealant is applied.",
+  "Learn the function of aircraft fuel system water drain testing.",
+  "Study the principles of aircraft fuel crossfeed valve inspection.",
+  "Review how aircraft fuel jettison system operation is verified.",
+  "Learn the function of aircraft refuelling panel pressure regulation.",
+  "Study the principles of aircraft defuelling and defuelling safety.",
+  "Review how aircraft fuel system inerting with nitrogen is performed.",
+  "Learn the function of aircraft fuel boost pump pressure output testing.",
+  "Study the principles of aircraft fuel quantity system zero calibration.",
+  "Review how aircraft fuel density compensator calibration is done.",
+  "Learn the function of aircraft hydraulic fluid sampling and analysis.",
+  "Study the principles of aircraft hydraulic filter replacement intervals.",
+  "Review how aircraft hydraulic system bleeding and purging is done.",
+  "Learn the function of aircraft hydraulic ground cart connection.",
+  "Study the principles of aircraft brake accumulator precharge verification.",
+  "Review how aircraft emergency brake system operation is tested.",
+  "Learn the function of aircraft parking brake system inspection.",
+  "Study the principles of aircraft tire hydroplaning speed calculation.",
+  "Review how aircraft tire inflation pressure corrections are made.",
+  "Learn the function of aircraft wheel assembly mounting torque.",
+  "Study the principles of aircraft fuse plug inspection after hot brake.",
+  "Review how aircraft brake assembly overhaul intervals are applied.",
+  "Learn the function of aircraft anti-skid valve testing procedures.",
+  "Study the principles of aircraft gear door uplock hook clearance.",
+  "Review how aircraft landing gear retraction test is performed.",
+  "Learn the function of aircraft nose gear shimmy damper servicing.",
+  "Study the principles of aircraft main gear shock strut servicing.",
+  "Review how aircraft gear position indicator rigging is verified.",
+  "Learn the function of aircraft gear warning horn system testing.",
+  "Study the principles of aircraft flap asymmetry protection systems.",
+  "Review how aircraft slat position feedback is verified after rigging.",
+  "Learn the function of aircraft ground spoiler deployment logic.",
+  "Study the principles of aircraft speed brake lever detent inspection.",
+  "Review how aircraft trim runaway protection is tested.",
+  "Learn the function of aircraft elevator feel unit pressure adjustment.",
+  "Study the principles of aircraft aileron droop system inspection.",
+  "Review how aircraft control surface free play measurement is done.",
+  "Learn the function of aircraft cable tension regulator inspection.",
+  "Study the principles of aircraft flight control computer BITE testing.",
+  "Review how aircraft FBW computer redundancy voting logic works.",
+  "Learn the function of aircraft primary flight computer replacement.",
+  "Study the principles of aircraft cockpit display reversionary modes.",
+  "Review how aircraft ACARS system datalink messages are verified.",
+  "Learn the function of aircraft health and usage monitoring systems.",
+  "Study the principles of aircraft ETOPS maintenance program requirements.",
+  "Review how aircraft performance monitoring data is collected.",
+  "Learn the function of aircraft reliability centered maintenance programs.",
+  "Study the principles of aircraft on-condition maintenance philosophy.",
+  "Review how aircraft maintenance intervals are justified and extended.",
+  "Learn the function of aircraft condition monitoring under CARs.",
+  "Study the principles of aircraft approved data hierarchy under CARs.",
+  "Review how aircraft foreign object damage is reported and recorded.",
+  "Learn the function of aircraft ground resonance identification.",
+  "Study the principles of aircraft rotor track and balance procedures.",
+  "Review how aircraft rotor blade inspection for delamination is done.",
+  "Learn the function of aircraft rotor system vibration analysis.",
+  "Study the principles of aircraft tail rotor rigging procedures.",
+  "Review how aircraft main rotor mast torque inspection is done.",
+  "Learn the function of aircraft swashplate assembly inspection.",
+  "Study the principles of aircraft rotor brake system inspection.",
+  "Review how aircraft dynamic component life limits are tracked.",
+  "Learn the function of aircraft health and usage monitoring for rotorcraft.",
+  "Study the principles of aircraft engine power assurance checks.",
+  "Review how aircraft engine exhaust temperature limiting is set.",
+  "Learn the function of aircraft engine N1 and N2 speed governor settings.",
+  "Study the principles of aircraft engine acceleration and deceleration control.",
+  "Review how aircraft engine starting system faults are isolated.",
+  "Learn the function of aircraft engine auto-relight systems.",
+  "Study the principles of aircraft engine wash procedures.",
+  "Review how aircraft engine power turbine blade inspection is done.",
+  "Learn the function of aircraft engine compressor wash frequency.",
+  "Study the principles of aircraft engine fuel system contamination.",
+  "Review how aircraft engine thrust reverser mechanical lock is tested.",
+  "Learn the function of aircraft engine vibration limit setting.",
+  "Study the principles of aircraft engine magnetic chip plug maintenance.",
+  "Review how aircraft engine borescope inspection planning is done.",
+  "Learn the function of aircraft engine service bulletin classification.",
+  "Study the principles of aircraft on-wing engine repair limits.",
+  "Review how aircraft engine removal and installation is documented.",
+  "Learn the function of aircraft engine preservation for storage.",
+  "Study the principles of aircraft engine transport and shipping.",
+  "Review how aircraft engine test cell acceptance runs are performed.",
+  "Learn the function of aircraft engine post-test inspection.",
+  "Study the principles of aircraft engine shop visit planning.",
+  "Review how aircraft engine core deterioration is monitored.",
+  "Learn the function of aircraft engine gas path analysis.",
+  "Study the principles of aircraft engine pyrometer calibration.",
+  "Review how aircraft engine rotor imbalance is detected and corrected.",
+  "Learn the function of aircraft engine N1 fan imbalance correction.",
+  "Study the principles of aircraft engine static and dynamic seals.",
+  "Review how aircraft engine bird ingestion inspection is done.",
+  "Learn the function of aircraft engine runway debris damage inspection.",
+  "Study the principles of aircraft fuel system pressure decay testing.",
+  "Review how aircraft hydraulic pump output flow is measured.",
+  "Learn the function of aircraft hydraulic system flushing procedures.",
+  "Study the principles of aircraft wheel well inspection for leaks.",
+  "Review how aircraft pressurization system leak rates are measured.",
+  "Learn the function of aircraft pressurization auto and standby modes.",
+  "Study the principles of aircraft safety valve cracking pressure testing.",
+];
+
+function loadDailyChallenge() {
+  const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  const el = document.getElementById('daily-challenge');
+  if (el) el.textContent = DAILY_CHALLENGES[dayOfYear % DAILY_CHALLENGES.length];
+}
+
+function loadAmeTip() {
+  const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  const el = document.getElementById('ame-tip');
+  if (el) el.textContent = AME_TIPS[(dayOfYear + 7) % AME_TIPS.length];
+}
+
+loadDailyChallenge();
+loadAmeTip();
+
+// ===== DAILY BIBLE VERSE =====
+const BIBLE_VERSES = [
+  '"The Lord is my shepherd; I shall not want." — Psalm 23:1',
+  '"I can do all things through Christ who strengthens me." — Philippians 4:13',
+  '"Be strong and courageous. Do not be afraid." — Joshua 1:9',
+  '"Trust in the Lord with all your heart." — Proverbs 3:5',
+  '"For I know the plans I have for you, declares the Lord." — Jeremiah 29:11',
+  '"The Lord your God is with you wherever you go." — Joshua 1:9',
+  '"Give thanks to the Lord, for he is good." — Psalm 107:1',
+  '"Cast all your anxiety on him because he cares for you." — 1 Peter 5:7',
+  '"Be still and know that I am God." — Psalm 46:10',
+  '"He gives strength to the weary." — Isaiah 40:29',
+  '"Walk by faith, not by sight." — 2 Corinthians 5:7',
+  '"The Lord will fight for you; you need only to be still." — Exodus 14:14',
+  '"Let your light shine before others." — Matthew 5:16',
+  '"With God all things are possible." — Matthew 19:26',
+  '"The joy of the Lord is your strength." — Nehemiah 8:10',
+  '"Love one another as I have loved you." — John 15:12',
+  '"Do not be anxious about anything." — Philippians 4:6',
+  '"Come to me, all who are weary, and I will give you rest." — Matthew 11:28',
+  '"God is our refuge and strength, an ever-present help in trouble." — Psalm 46:1',
+  '"Give and it will be given to you." — Luke 6:38',
+  '"Your word is a lamp to my feet and a light to my path." — Psalm 119:105',
+  '"Seek first his kingdom and his righteousness." — Matthew 6:33',
+  '"The Lord is close to the brokenhearted." — Psalm 34:18',
+  '"Even youths grow tired and weary, but those who hope in the Lord will renew their strength." — Isaiah 40:30-31',
+  '"This is the day the Lord has made; let us rejoice and be glad." — Psalm 118:24',
+  '"For where two or three gather in my name, there am I with them." — Matthew 18:20',
+  '"Blessed are the pure in heart, for they will see God." — Matthew 5:8',
+  '"Be kind and compassionate to one another." — Ephesians 4:32',
+  '"The Lord bless you and keep you." — Numbers 6:24',
+  '"Create in me a pure heart, O God." — Psalm 51:10',
+  '"Delight yourself in the Lord and he will give you the desires of your heart." — Psalm 37:4'
+];
+
+function loadDailyVerse() {
+  const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  const verse = BIBLE_VERSES[dayOfYear % BIBLE_VERSES.length];
+  const el = document.getElementById('bible-verse');
+  if (el) el.textContent = verse;
+}
+
+loadDailyVerse();
+
+// ===== INIT =====
+// Set today's date as default in calendar form
+document.getElementById('event-date').value = today.toISOString().split('T')[0];
+checkOllama();
+
+// ===== CUSTOM KEYBOARD =====
+const KB_ROWS = {
+  num:  ['1','2','3','4','5','6','7','8','9','0'],
+  row1: ['q','w','e','r','t','y','u','i','o','p'],
+  row2: ['a','s','d','f','g','h','j','k','l'],
+  row3: ['SHIFT','z','x','c','v','b','n','m','DEL'],
+  row4: ['@','.','SPACE','!','?']
+};
+
+let kbTarget = null;
+let kbShift = false;
+
+function buildKeyboard() {
+  function makeRow(rowId, keys) {
+    const row = document.getElementById(rowId);
+    if (!row) return;
+    row.innerHTML = '';
+    keys.forEach(k => {
+      const btn = document.createElement('button');
+      btn.className = 'kb-key' + (k === 'SPACE' ? ' space' : k === 'SHIFT' || k === 'DEL' ? ' dark wide' : '');
+      btn.textContent = k === 'SPACE' ? 'space' : k === 'SHIFT' ? '⇧' : k === 'DEL' ? '⌫' : k;
+      btn.setAttribute('data-key', k);
+      btn.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); handleKey(k); }, {passive: false});
+      btn.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); handleKey(k); });
+      row.appendChild(btn);
+    });
+  }
+  makeRow('kb-row-num', KB_ROWS.num);
+  makeRow('kb-row-1', KB_ROWS.row1);
+  makeRow('kb-row-2', KB_ROWS.row2);
+  makeRow('kb-row-3', KB_ROWS.row3);
+  makeRow('kb-row-4', KB_ROWS.row4);
+}
+
+function handleKey(k) {
+  if (!kbTarget) return;
+  const el = kbTarget;
+  let val = el.value || '';
+  let start = typeof el.selectionStart === 'number' ? el.selectionStart : val.length;
+  let end = typeof el.selectionEnd === 'number' ? el.selectionEnd : val.length;
+
+  if (k === 'DEL') {
+    if (start !== end) { val = val.slice(0, start) + val.slice(end); el.value = val; el.setSelectionRange(start, start); }
+    else if (start > 0) { val = val.slice(0, start-1) + val.slice(start); el.value = val; el.setSelectionRange(start-1, start-1); }
+  } else if (k === 'SHIFT') {
+    kbShift = !kbShift;
+    document.querySelectorAll('#kb-row-1 .kb-key, #kb-row-2 .kb-key').forEach(b => {
+      const dk = b.getAttribute('data-key');
+      if (dk && dk.length === 1) b.textContent = kbShift ? dk.toUpperCase() : dk;
+    });
+    return;
+  } else if (k === 'SPACE') {
+    val = val.slice(0, start) + ' ' + val.slice(end);
+    el.value = val; el.setSelectionRange(start+1, start+1);
+  } else {
+    const char = kbShift ? k.toUpperCase() : k;
+    val = val.slice(0, start) + char + val.slice(end);
+    el.value = val; el.setSelectionRange(start+char.length, start+char.length);
+    if (kbShift) { kbShift = false; }
+  }
+  el.dispatchEvent(new Event('input', {bubbles: true}));
+  updateKbPreview();
+}
+
+function updateKbPreview() {
+  // Highlight active field with blue border
+  document.querySelectorAll('.form-input').forEach(i => i.style.borderColor = '');
+  if (kbTarget && kbTarget.classList && kbTarget.classList.contains('form-input')) {
+    kbTarget.style.borderColor = '#0A84FF';
+  }
+}
+
+function showKeyboard(el) {
+  kbTarget = el;
+  document.getElementById('kb-overlay').classList.add('active');
+  document.getElementById('keyboard').classList.add('active');
+  updateKbPreview();
+
+  // If input is inside the add modal, shift modal up above keyboard
+  const modal = document.getElementById('add-modal-overlay');
+  const modalInner = modal ? modal.querySelector('div') : null;
+  if (modalInner && modal.style.display === 'flex') {
+    modalInner.style.transition = 'transform 0.28s cubic-bezier(0.32,0.72,0,1)';
+    modalInner.style.transform = 'translateY(-420px)';
+    return;
+  }
+
+  // If input is the chat input, shift the chat input area above keyboard
+  const chatInput = document.getElementById('chat-input');
+  const chatArea = document.querySelector('.chat-input-area');
+  if (el === chatInput && chatArea) {
+    const kbHeight = window.innerHeight - el.getBoundingClientRect().top + 20;
+    chatArea.style.transition = 'transform 0.28s cubic-bezier(0.32,0.72,0,1)';
+    chatArea.style.transform = 'translateY(-380px)';
+    const msgs = document.getElementById('chat-messages');
+    if (msgs) msgs.style.paddingBottom = '400px';
+    setTimeout(() => { if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50);
+  }
+}
+
+function dismissKeyboard() {
+  document.getElementById('kb-overlay').classList.remove('active');
+  document.getElementById('keyboard').classList.remove('active');
+  kbTarget = null;
+
+  // Reset modal position
+  const modal = document.getElementById('add-modal-overlay');
+  const modalInner = modal ? modal.querySelector('div') : null;
+  if (modalInner) modalInner.style.transform = 'translateY(0)';
+
+  // Reset chat input area position
+  const chatArea = document.querySelector('.chat-input-area');
+  if (chatArea) chatArea.style.transform = 'translateY(0)';
+  const msgs = document.getElementById('chat-messages');
+  if (msgs) {
+    msgs.style.paddingBottom = '16px';
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+}
+
+function attachKeyboard(el) {
+  if (el.dataset.kbAttached) return;
+  el.dataset.kbAttached = 'true';
+  el.setAttribute('readonly', 'readonly');
+  el.setAttribute('inputmode', 'none');
+  el.addEventListener('touchstart', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    showKeyboard(el);
+  }, {passive: false});
+  el.addEventListener('click', e => {
+    e.preventDefault();
+    showKeyboard(el);
+  });
+}
+
+function initKeyboard() {
+  buildKeyboard();
+  document.querySelectorAll('input[type="text"], input[type="time"], input[type="date"], textarea').forEach(attachKeyboard);
+}
+
+// Re-run whenever page changes so newly visible inputs get attached
+const _kbOrigShowPage = window.showPage;
+window.showPage = function(page) {
+  _kbOrigShowPage(page);
+  setTimeout(() => {
+    document.querySelectorAll('input[type="text"], input[type="time"], input[type="date"], textarea').forEach(attachKeyboard);
+  }, 100);
+};
+
+setTimeout(initKeyboard, 400);
+
+// ===== SWIPE NAVIGATION =====
+const PAGE_ORDER = ['calendar', 'home', 'chat'];
+let touchStartX = 0;
+let touchStartY = 0;
+let currentPageIndex = 1;
+
+document.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, {passive: true});
+
+document.addEventListener('touchend', e => {
+  if (document.getElementById('keyboard').classList.contains('active')) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;
+  if (dx < 0 && currentPageIndex < PAGE_ORDER.length - 1) { currentPageIndex++; showPage(PAGE_ORDER[currentPageIndex]); }
+  else if (dx > 0 && currentPageIndex > 0) { currentPageIndex--; showPage(PAGE_ORDER[currentPageIndex]); }
+}, {passive: true});
+
+const _origShowPage = showPage;
+window.showPage = function(page) {
+  currentPageIndex = PAGE_ORDER.indexOf(page);
+  _origShowPage(page);
+};
+
+</script>
+
+<!-- CUSTOM KEYBOARD -->
+<div class="kb-overlay" id="kb-overlay" onclick="dismissKeyboard()"></div>
+<div class="keyboard" id="keyboard">
+  <div style="display:flex;justify-content:flex-end;padding:0 10px 6px;">
+    <button class="kb-done" onclick="dismissKeyboard()">Done</button>
+  </div>
+  <div class="kb-row" id="kb-row-num"></div>
+  <div class="kb-row" id="kb-row-1"></div>
+  <div class="kb-row" id="kb-row-2"></div>
+  <div class="kb-row" id="kb-row-3"></div>
+  <div class="kb-row" id="kb-row-4"></div>
+</div>
+
+</body>
+</html>
